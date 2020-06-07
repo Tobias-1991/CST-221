@@ -1,5 +1,5 @@
 /* Hello World program */
-#include<stdio.h>
+#include <stdio.h>
 main()
 {
 	printf("Hello World");
