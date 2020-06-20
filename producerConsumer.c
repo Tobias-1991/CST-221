@@ -1,73 +1,100 @@
-/* 
+/*
 Zachary Gardner
-Consumer Producer problem
-This project proved to be extremely challenging for me.
-I understand the concept of what needs to happen: Create a buffer between two processes
-in such a way that they can run continuously without failing. 
- This should be done without the use of semaphores or monitors. 
-I am very new to C, and my lack of experience made this project difficult.
-I used the textbook and assignment instructions as much as I could
-but ran out of time to get my program running.
+CST-221
+producerConsumer project
 
+In this assignment we are to manage
+processes and threads as they are
+produced and then consumed.
 */
-
-
-
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <pthread.h>
-#define N 4
-int count = 0;
+
 int theProduct;
-// Declare global variables
 
-//producer function checks for count, if 4, producer going to sleep and signals consumer to wake up
-//if count is below 4, producer adds 1 to the count. 
-void producer() {
+#define bufferSize 4
 
-	int i;
-
-	while(1) {
-		
-		i  = produce();
-		if (count == N) sleep();
-		puts(i); 
-		count = count +1;
-		if(count == 1) wakeup(consumer);
-		
-	}
-}
-// Consumer checks count for it's value, if 0 consumer falls asleep and directs producer to start.
-// if >= 1 consumer will consume and count down on the counter.
-void consumer() {
-	int i;
-	while(1) {
-		if(count ==0) sleep();
-		i = gets();
-		count = count - 1;
-		if(count == N - 1) wakeup(producer);
-		consume(i);
-	}
-}
-// This function was found in the   textbook but I don't understand it's use at this time.
+//The produce() function creates a thread that fills the buffer with numbers.
 int produce() {
-
 	theProduct++;
-
+	printf("Produced: %i\n", theProduct);
 	return theProduct;
 }
+//The consume() function creates a thread that consumes numbers from the buffer.
+int consume(){
+    theProduct--;
+	printf("Consumed: %i\n", theProduct);
+	return theProduct;
+}
+//The producer function uses an infinite while loop to generate numbers from the
+//produce and put functions.
+void *producer() {
+	int i;
+	while(1) {
+		i = produce();
+            put(i);
+    if(theProduct == bufferSize) {
+        sleep(i);
+    }
+    else {
+        produce();
 
-void consume(int i) {
-	printf("%i", i);
+    }
+	}
+}
+// the consumer() function uses the consume and get functions
+//to "consume" numbers from the buffer.
+int *consumer() {
+	int i;
+	while(1) {
+		i = consume();
+		get(i);
+    if (theProduct == 0) {
+        sleep(i);
+    } else {
+        consume();
+    }
+	}
+}
+// If there is room in the buffer for more numbers,
+//the put() function will insert numbers until
+//the buffer is filled.  It will then wake the consume function.
+void put(int i) {
+    if(theProduct == bufferSize) {
+        sleep(i);
+    } else {
+        produce(i);
+    }
+}
+// the wake() function(when working) will wake the consumer when the buffer is filled,
+//And wake the producer when the buffer is empty.
+void wake() {
+}
+int get(int i) {
+    if(theProduct == 0) {
 
 
-void main() {
-
-	pthread_t threadOne;
-	
-	pthread_create(&threadOne, NULL, producer, NULL);
-	
-	consumer();
-	producer();
-	
+        sleep(i);
+    } else {
+        consume(i);
 }
 }
+//Here we have the main function.  This is where we run all of our code.
+//With the current build, producer will produce 4 numbers, it will then pause for about 10 seconds,
+//It will then continue producing indefinitely.
+//As for the consumer function, it will only consume if the producer function is not running.
+int main() {
+    /*For some reason the producer function will produce on it's own, and with the consumer function.
+    However, the consumer function will not run unless it is by itself.*/
+
+    consumer();
+
+}
+
+
+
+
+
+
