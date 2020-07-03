@@ -68,6 +68,7 @@ void printIEEE(myfloat var) {
 
 
 //Display the number as a 32 bit hexadecimal number
+//This is displaying the correct hex value, but not in the long format.
 long decimalToHex(long decimalNum) {
 
     long quotient, remainder;
@@ -75,7 +76,9 @@ long decimalToHex(long decimalNum) {
     char hexaDeci[100];
 
     quotient = decimalNum;
-
+    //If the remainder is under 10 after dividing by 16, add 48 to the remainder.
+    //If the remainder is over 10, add 55 to the remainder.
+    //Continue this until the quotient value is equal to 0.
     while (quotient != 0) {
         remainder = quotient % 16;
         if (remainder < 10)
@@ -104,10 +107,11 @@ int main()
 {
 
     myfloat var;
+    //Getting the decimal number from user.
     var.f = requestRandom();
     printf("IEEE 754 representation of %f is : \n",
           var.f);
-
+    //Printing out the 32 bit binary.
     printIEEE(var);
 
     decimalToHex(var.f);
